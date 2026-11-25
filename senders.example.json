@@ -1,0 +1,16 @@
+[
+  {
+    "name": "Alex Mercer",
+    "email": "alex.mercer.music@gmail.com",
+    "appPassword": "abcd efgh ijkl mnop",
+    "dailyCap": 20,
+    "enabled": true
+  },
+  {
+    "name": "Jamie Hart",
+    "email": "jamiehart.studio@gmail.com",
+    "appPassword": "qrst uvwx yzab cdef",
+    "dailyCap": 20,
+    "enabled": true
+  }
+]

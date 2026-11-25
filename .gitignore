@@ -4,3 +4,5 @@ leads*.json
 *-pitches.json
 *-pitches.md
 .DS_Store
+senders.json
+daylog.json

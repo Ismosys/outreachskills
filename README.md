@@ -28,6 +28,9 @@ Plus:
   A pitch is picked by a hash of the lead's email, so the same person always gets the same one and
   the mix stays even across a run.
 - `tools/pitch.mjs` — turns a leads file into finished pitches without any desktop app.
+- `tools/draft-gmail.mjs` — saves those pitches as **Gmail drafts across several accounts** over
+  IMAP, round-robin within a daily cap per inbox. No dependencies, nothing is ever sent.
+  Setup: [docs/gmail-setup.md](docs/gmail-setup.md).
 
 ## Install
 
@@ -56,7 +59,7 @@ Restart Claude Code. It picks up the skills from their descriptions, so you ask 
 
 ## The two ways to use it
 
-### 1. Scout, then pitch (works for everyone)
+### 1. Scout, then pitch, then draft
 
 Ask Claude to scout. Each scout prints `{ stats, leads }` and can save the leads with `--out`:
 
@@ -74,11 +77,24 @@ Then write the pitches:
 node tools/pitch.mjs leads.json --name "Your Name" --record
 ```
 
-That writes `leads-pitches.md` (readable, one pitch per lead — paste into Gmail) and
-`leads-pitches.json` (subject + body per lead, for any mail tool you like). `--record` adds everyone
-to your local *never twice* list, so the next scout run skips them.
+That writes `leads-pitches.md` (readable, one pitch per lead) and `leads-pitches.json` (subject +
+body per lead). `--record` adds everyone to your local *never twice* list, so the next scout run
+skips them.
 
-### 2. One command for a whole run (needs the Reverb app)
+Then put them in Gmail as drafts, spread over as many accounts as you've set up:
+
+```bash
+node tools/draft-gmail.mjs --test                 # check every account's login first
+node tools/draft-gmail.mjs leads-pitches.json     # draft, round-robin within each daily cap
+```
+
+Each inbox signs with its own name, skips anyone already in its Sent or Drafts, and stops at its
+daily cap. **Read [docs/gmail-setup.md](docs/gmail-setup.md) before this** — it covers creating the
+accounts, 2-Step Verification, app passwords, `senders.json`, and what daily caps to start at.
+
+Or skip Gmail entirely and paste from `leads-pitches.md` by hand.
+
+### 2. One command for a whole run (the orchestrator)
 
 `artist-reach-run` starts all four scouts in parallel, keeps going until it has N new leads, writes a
 pitch for each, and saves the drafts straight into Gmail over IMAP:
@@ -87,13 +103,14 @@ pitch for each, and saves the drafts straight into Gmail over IMAP:
 node ~/.claude/skills/artist-reach-run/scripts/run.mjs --target 100 --minutes 60
 ```
 
-The Gmail drafting and the shared contact list come from **Reverb**, a Mac app that isn't in this
-repo. Without it the runner still scouts and still writes every pitch — it just can't put them in
-Gmail, so use `--no-draft` and hand the saved run file to `tools/pitch.mjs`:
+Its built-in drafting step talks to **Reverb**, a Mac app that isn't in this repo. Without Reverb the
+runner still scouts and still writes every pitch — so run it with `--no-draft` and use the two tools
+above, which do the same job:
 
 ```bash
 node ~/.claude/skills/artist-reach-run/scripts/run.mjs --target 100 --no-draft
-node tools/pitch.mjs ~/.claude/skills/artist-reach-run/runs/<the-file>.json --name "Your Name" --record
+node tools/pitch.mjs ~/.claude/skills/artist-reach-run/runs/<the-file>.json --record
+node tools/draft-gmail.mjs ~/.claude/skills/artist-reach-run/runs/<the-file>-pitches.json
 ```
 
 ## Never pitching the same person twice
