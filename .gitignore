@@ -1,0 +1,6 @@
+node_modules/
+runs/
+leads*.json
+*-pitches.json
+*-pitches.md
+.DS_Store
